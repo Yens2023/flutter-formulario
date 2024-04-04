@@ -85,6 +85,16 @@ class _RegisterFormState extends State<_RegisterForm> {
               },
             ),
             const SizedBox(height: 10),
+            CustomTextFormField(
+              label: 'Contraseña',
+              onChanged: (value) => password = value,
+              validator: (value) {
+                if (value == null || value.isEmpty) return 'Campo requerido';
+                if (value.trim().isEmpty) return 'Campo requerido';
+                if (value.length < 6) return 'Más de 6 letras';
+                return null;
+              },
+            ),
             FilledButton.tonalIcon(
               onPressed: () {
                 final isValid = _formKey.currentState!.validate();
