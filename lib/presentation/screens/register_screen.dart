@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_formularios/presentation/blocs/register/register_cubit.dart';
 import 'package:flutter_formularios/presentation/widgets/inputs/custom_text_form_field.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -10,7 +12,10 @@ class RegisterScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Nuevo Usuario'),
       ),
-      body: const _RegisterView(),
+      body: BlocProvider(
+        create: (context) => RegisterCubit(),
+        child: const _RegisterView(),
+      ),
     );
   }
 }
@@ -20,16 +25,18 @@ class _RegisterView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FlutterLogo(size: 100),
-            _RegisterForm(),
-            SizedBox(height: 20),
-          ],
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: SingleChildScrollView(
+          child: Column(
+            //mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              FlutterLogo(size: 100),
+              _RegisterForm(),
+              SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -37,19 +44,18 @@ class _RegisterView extends StatelessWidget {
 }
 
 class _RegisterForm extends StatefulWidget {
-  const _RegisterForm({super.key});
+  const _RegisterForm();
 
   @override
   State<_RegisterForm> createState() => _RegisterFormState();
 }
 
 class _RegisterFormState extends State<_RegisterForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-    String username = '';
-    String email = '';
-    String password = '';
+    final registerCubit = context.watch<RegisterCubit>();
 
     return Form(
         key: _formKey,
@@ -57,7 +63,10 @@ class _RegisterFormState extends State<_RegisterForm> {
           children: [
             CustomTextFormField(
               label: 'Nombre de usuario',
-              onChanged: (value) => username = value,
+              onChanged: (value) {
+                registerCubit.usernameChanged(value);
+                _formKey.currentState?.validate();
+              },
               validator: (value) {
                 if (value == null || value.isEmpty) return 'Campo requerido';
                 if (value.trim().isEmpty) return 'Campo requerido';
@@ -68,7 +77,10 @@ class _RegisterFormState extends State<_RegisterForm> {
             const SizedBox(height: 10),
             CustomTextFormField(
               label: 'Correo electrónico',
-              onChanged: (value) => email = value,
+              onChanged: (value) {
+                registerCubit.emailChanged(value);
+                _formKey.currentState?.validate();
+              },
               validator: (value) {
                 if (value == null || value.isEmpty) return 'Campo requerido';
                 if (value.trim().isEmpty) return 'Campo requerido';
@@ -87,7 +99,10 @@ class _RegisterFormState extends State<_RegisterForm> {
             const SizedBox(height: 10),
             CustomTextFormField(
               label: 'Contraseña',
-              onChanged: (value) => password = value,
+              onChanged: (value) {
+                registerCubit.passwordChanged(value);
+                _formKey.currentState?.validate();
+              },
               validator: (value) {
                 if (value == null || value.isEmpty) return 'Campo requerido';
                 if (value.trim().isEmpty) return 'Campo requerido';
@@ -99,7 +114,7 @@ class _RegisterFormState extends State<_RegisterForm> {
               onPressed: () {
                 final isValid = _formKey.currentState!.validate();
                 if (!isValid) return;
-                print('$username, $email, $password');
+                registerCubit.onSubmit();
               },
               icon: const Icon(Icons.save),
               label: const Text('Crear usuario'),
