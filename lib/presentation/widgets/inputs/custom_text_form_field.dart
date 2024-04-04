@@ -6,7 +6,7 @@ class CustomTextFormField extends StatelessWidget {
   final String? errorMessage;
   final bool obscureText;
   final Function(String)? onChanged;
-  final String? Function(String?) validator;
+  final String? Function(String?)? validator;
 
   const CustomTextFormField({
     super.key,
@@ -15,7 +15,7 @@ class CustomTextFormField extends StatelessWidget {
     this.errorMessage,
     this.obscureText = false,
     this.onChanged,
-    required this.validator,
+    this.validator,
   });
 
   @override
